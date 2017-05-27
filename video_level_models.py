@@ -48,9 +48,9 @@ class LogisticModel(models.BaseModel):
       
     split0, split1 = tf.split(model_input, 2 , 1)
 
-    output = slim.fully_connected(
-        model_input, vocab_size, activation_fn=tf.nn.sigmoid,
-        weights_regularizer=slim.l2_regularizer(l2_penalty))
+    #output = slim.fully_connected(
+    #    model_input, vocab_size, activation_fn=tf.nn.sigmoid,
+    #    weights_regularizer=slim.l2_regularizer(l2_penalty))
     
     output0 = slim.fully_connected(
         split0, vocab_size, activation_fn=tf.nn.sigmoid,
@@ -61,8 +61,8 @@ class LogisticModel(models.BaseModel):
         weights_regularizer=slim.l2_regularizer(l2_penalty))
     
     outputAvg = tf.add(output0, output1)
-    outputAvg1 = tf.add(output, outputAvg)
-    outFinal = tf.scalar_mul(0.3333, outputAvg1)
+    #outputAvg1 = tf.add(output, outputAvg)
+    outFinal = tf.scalar_mul(0.5, outputAvg)
     return {"predictions": outFinal}
 
 class MoeModel(models.BaseModel):
