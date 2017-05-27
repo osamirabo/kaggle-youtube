@@ -46,7 +46,7 @@ class LogisticModel(models.BaseModel):
     
     l = [model_input_shape[1]/2 , model_input_shape[1]/2]
       
-    split0, split1 = tf.split(model_input, l, 1)
+    split0, split1 = tf.split(model_input, [model_input_shape[1]/2 , model_input_shape[1]/2], 1)
 
     output = slim.fully_connected(
         model_input, vocab_size, activation_fn=tf.nn.sigmoid,
