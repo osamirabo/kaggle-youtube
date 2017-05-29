@@ -99,7 +99,7 @@ class FrameLevelLogisticModel(models.BaseModel):
     l = list()
     for i in range(0, max_frame):
         output = slim.fully_connected(
-            model_input[i, :, :], vocab_size, activation_fn=tf.nn.sigmoid,
+            model_input[:, i, :], vocab_size, activation_fn=tf.nn.sigmoid,
             weights_regularizer=slim.l2_regularizer(1e-8))
       
         l.append(output)
