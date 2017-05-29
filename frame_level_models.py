@@ -106,7 +106,7 @@ class FrameLevelLogisticModel(models.BaseModel):
         l.append(output)
     avg_output = tf.add_n(l)
     outFinal = tf.scalar_mul(0.1, avg_output)
-    return {"predictions": avg_output}
+    return {"predictions": outFinal}
 
 class DbofModel(models.BaseModel):
   """Creates a Deep Bag of Frames model.
