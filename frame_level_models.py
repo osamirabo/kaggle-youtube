@@ -52,18 +52,15 @@ class FrameLevelLogisticModel(models.BaseModel):
   def create_model(self, model_input, vocab_size, num_frames, **unused_params):
     """Creates a model which uses a logistic classifier over the average of the
     frame-level features.
-
     This class is intended to be an example for implementors of frame level
     models. If you want to train a model over averaged features it is more
     efficient to average them beforehand rather than on the fly.
-
     Args:
       model_input: A 'batch_size' x 'max_frames' x 'num_features' matrix of
                    input features.
       vocab_size: The number of classes in the dataset.
       num_frames: A vector of length 'batch' which indicates the number of
            frames for each video (before padding).
-
     Returns:
       A dictionary with a tensor containing the probability predictions of the
       model in the 'predictions' key. The dimensions of the tensor are
@@ -98,9 +95,14 @@ class FrameLevelLogisticModel(models.BaseModel):
 
     l = list()
   
-    for i in range(0, 10):#max_frame):
+    for i in range(0, 5*25, 5):#max_frame):
+        l1 = list()
+        for j in range(0, 5):
+            l1.append(model_input[:, i + j, :])
+        model_input_avg = tf.add_n(l1)
+        model_input_avg_final = tf.scalar_mul(0.2, model_input_avg) 
         output = slim.fully_connected(
-            model_input[:, i, :], vocab_size, activation_fn=tf.nn.sigmoid,
+            model_input_avg_final, vocab_size, activation_fn=tf.nn.sigmoid,
             weights_regularizer=slim.l2_regularizer(1e-8))
       
         l.append(output)
@@ -110,21 +112,17 @@ class FrameLevelLogisticModel(models.BaseModel):
 
 class DbofModel(models.BaseModel):
   """Creates a Deep Bag of Frames model.
-
   The model projects the features for each frame into a higher dimensional
   'clustering' space, pools across frames in that space, and then
   uses a configurable video-level model to classify the now aggregated features.
-
   The model will randomly sample either frames or sequences of frames during
   training to speed up convergence.
-
   Args:
     model_input: A 'batch_size' x 'max_frames' x 'num_features' matrix of
                  input features.
     vocab_size: The number of classes in the dataset.
     num_frames: A vector of length 'batch' which indicates the number of
          frames for each video (before padding).
-
   Returns:
     A dictionary with a tensor containing the probability predictions of the
     model in the 'predictions' key. The dimensions of the tensor are
@@ -224,14 +222,12 @@ class LstmModel(models.BaseModel):
 
   def create_model(self, model_input, vocab_size, num_frames, **unused_params):
     """Creates a model which uses a stack of LSTMs to represent the video.
-
     Args:
       model_input: A 'batch_size' x 'max_frames' x 'num_features' matrix of
                    input features.
       vocab_size: The number of classes in the dataset.
       num_frames: A vector of length 'batch' which indicates the number of
            frames for each video (before padding).
-
     Returns:
       A dictionary with a tensor containing the probability predictions of the
       model in the 'predictions' key. The dimensions of the tensor are
@@ -259,4 +255,4 @@ class LstmModel(models.BaseModel):
     return aggregated_model().create_model(
         model_input=state[-1].h,
         vocab_size=vocab_size,
-        **unused_params)
+**unused_params)
