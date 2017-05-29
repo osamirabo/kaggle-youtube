@@ -71,16 +71,41 @@ class FrameLevelLogisticModel(models.BaseModel):
     """
     num_frames = tf.cast(tf.expand_dims(num_frames, 1), tf.float32)
     feature_size = model_input.get_shape().as_list()[2]
+    max_frame = model_input.get_shape().as_list()[1]
+    batch_size = model_input.get_shape().as_list()[0]
+    step = 8
+    new_feature_size = max_frame
+    if(max_frame % 8 == 0):
+        step = 8
+        new_feature_size = max_frame/8
+    elif(max_frame % 10 == 0):
+        step = 10
+        new_feature_size = max_frame/10
+        
+    model_input_new = tf.zeros([batch_size, new_feature_size, feature_size], tf.float32)
+    output = tf.zeros([batch_size, new_feature_size, vocab_size], tf.float32)
+    for i in range(0, batch_size, 1):
+        for j in range(0, max_frame, step):
+            l = list()
+            for k in range(0, step, 1):
+                l.append(model_input[i, j + k, :])
+            model_input_new[i, j, :] = tf.add_n(l)
 
     denominators = tf.reshape(
         tf.tile(num_frames, [1, feature_size]), [-1, feature_size])
     avg_pooled = tf.reduce_sum(model_input,
                                axis=[1]) / denominators
 
-    output = slim.fully_connected(
-        avg_pooled, vocab_size, activation_fn=tf.nn.sigmoid,
-        weights_regularizer=slim.l2_regularizer(1e-8))
-    return {"predictions": output}
+    for i in range(0, new_feature_size):
+        output[i,:,:] = slim.fully_connected(
+            model_input_new[i, :, :], vocab_size, activation_fn=tf.nn.sigmoid,
+            weights_regularizer=slim.l2_regularizer(1e-8))
+    
+    l = list()
+    for k in range(0, new_feature_size, 1):
+        l.append(output[i,:,:])
+    avg_output = tf.add_n(l)
+    return {"predictions": avg_output}
 
 class DbofModel(models.BaseModel):
   """Creates a Deep Bag of Frames model.
