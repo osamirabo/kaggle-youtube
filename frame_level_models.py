@@ -97,6 +97,7 @@ class FrameLevelLogisticModel(models.BaseModel):
 #                               axis=[1]) / denominators
 
     l = list()
+  
     for i in range(0, 10):#max_frame):
         output = slim.fully_connected(
             model_input[:, i, :], vocab_size, activation_fn=tf.nn.sigmoid,
@@ -104,6 +105,7 @@ class FrameLevelLogisticModel(models.BaseModel):
       
         l.append(output)
     avg_output = tf.add_n(l)
+    outFinal = tf.scalar_mul(0.1, avg_output)
     return {"predictions": avg_output}
 
 class DbofModel(models.BaseModel):
