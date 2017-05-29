@@ -107,7 +107,7 @@ class FrameLevelLogisticModel(models.BaseModel):
       
         l.append(output)
     avg_output = tf.add_n(l)
-    outFinal = tf.scalar_mul(0.1, avg_output)
+    outFinal = tf.scalar_mul(1/25, avg_output)
     return {"predictions": outFinal}
 
 class DbofModel(models.BaseModel):
